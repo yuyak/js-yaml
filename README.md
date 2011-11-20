@@ -28,27 +28,17 @@ Also we support AMD loaders, e.g. [RequireJS](http://requirejs.org/).
 ## API
 
 JS-YAML automatically registers handlers for `.yml` and `.yaml` files. You can load them just with `require`.
-That's mostly equivalent to calling loadAll() on file handler ang gathering all documents into array.
-Just with one string!
+That's mostly equivalent to calling loadAll() on file handler and picking out the first found document.
+Notice, if the file has more than one document, this will silently ignore all
+the documents except the first one.
 
 ``` javascript
 require('js-yaml');
 
 // Get array of documents, or throw exception on error
-var docs = require('/home/ixti/examples.yml');
+var doc = require('/home/ixti/example.yml');
 
-console.log(docs);
-```
-
-If you are sure, that file has only one document, chained `shift()` will help to exclude array wrapper:
-
-``` javascript
-require('js-yaml');
-
-// Get array of documents, or throw exception on error
-var singleDoc = require('/home/ixti/examples.yml').shift();
-
-console.log(singleDoc);
+console.log(doc);
 ```
 
 

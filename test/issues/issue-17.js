@@ -6,6 +6,6 @@ var issue = module.exports = {},
 issue.title = "#17: Non-specific `!` tags should resolve to !!str";
 issue.fixed = true;
 issue.execute = function () {
-  var str = require(source).shift();
+  var str = require(source);
   assert.equal('string', typeof str);
 };

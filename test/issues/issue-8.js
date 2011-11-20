@@ -7,6 +7,6 @@ issue.title = "#8: Parse failed when no document start present";
 issue.fixed = true;
 issue.execute = function () {
   assert.doesNotThrow(function () {
-    require(source).shift();
+    require(source);
   }, TypeError);
 };

@@ -1,5 +1,11 @@
+0.4.0 / ????-??-??
+------------------
+
+* API change that breaks backward compatibility: require returns first found
+  document in the stream instead of array of documents. See #10.
+
 0.3.1 / 2011-11-18
----------
+------------------
 
 * Added AMD support for browserified version.
 * Wrapped browserified js-yaml into closure.
