@@ -91,6 +91,18 @@ fs.readFile('/home/ixti/example.yml', 'utf8', function (err, data) {
 ```
 
 
+### safeLoad (string|buffer|file\_resource)
+
+Same as `load()` but uses _safe_ schema - only recommended tags of YAML
+specification (no JavaScript-specific tags, e.g. `!!js/regexp`).
+
+
+### safeLoadAll (string|buffer|file\_resource, iterator)
+
+Same as `loadAll()` but uses _safe_ schema - only recommended tags of YAML
+specification (no JavaScript-specific tags, e.g. `!!js/regexp`).
+
+
 ## JavaScript YAML tags scheme
 
 The list of standard YAML tags and corresponding JavaScipt types. See also
@@ -116,9 +128,8 @@ The list of standard YAML tags and corresponding JavaScipt types. See also
 ```
 !!js/regexp /pattern/gim    # RegExp
 !!js/undefined ''           # Undefined
+!!js/func   function () {}  # Function
 ```
-
-More JavaScript-specific YAML tags will be availble soon: (`function`).
 
 ### Caveats
 
