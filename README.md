@@ -14,6 +14,17 @@ Now you can use all modern YAML feature right in JavaScript. Originally snapshot
 npm install js-yaml
 ```
 
+You can install JS-YAML globally (with `-g` npm argument), and use it to inspect
+your YAML files:
+
+```
+$ jsyaml /home/ixti/example.yml 
+---------------------------------------------------------------------------
+{ jsyaml: 'rocks!' }
+...........................................................................
+```
+
+
 ### bundled YAML library for browser
 
 ``` html
@@ -126,9 +137,9 @@ The list of standard YAML tags and corresponding JavaScipt types. See also
 **JavaScript-specific tags**
 
 ```
-!!js/regexp /pattern/gim    # RegExp
-!!js/undefined ''           # Undefined
-!!js/func   function () {}  # Function
+!!js/regexp /pattern/gim            # RegExp
+!!js/undefined ''                   # Undefined
+!!js/function 'function () {...}'   # Function
 ```
 
 ### Caveats

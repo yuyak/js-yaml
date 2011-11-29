@@ -4,6 +4,12 @@
 * API change that breaks backward compatibility: require returns first found
   document in the stream instead of array of documents. See #10.
 
+0.3.2 / ????-??-??
+------------------
+
+* Added jsyaml executable.
+* Added !!js/function support. Finally resolves #12.
+
 0.3.1 / 2011-11-18
 ------------------
 
