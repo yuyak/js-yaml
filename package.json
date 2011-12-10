@@ -1,8 +1,11 @@
 {
   "name"            : "js-yaml",
   "version"         : "0.3.1",
-  "description"     : "YAML 1.1 Parser",
-  "keywords"        : ["yaml", "parser", "pyyaml"],
+  "description"     : "YAML 1.1 Parser/Dumper",
+  "keywords"        : [
+                        "yaml", "dumper", "emitter", "parser", "loader",
+                        "pyyaml", "native"
+                      ],
   "homepage"        : "https://github.com/nodeca/js-yaml",
 
   "author"          : "Aleksey V Zapparov <ixti@member.fsf.org> (http://www.ixti.net/)",
@@ -11,8 +14,11 @@
   "license"         : { "type": "MIT", "url": "https://github.com/nodeca/js-yaml/blob/master/LICENSE" },
   "repository"      : { "type": "git", "url": "git://github.com/nodeca/js-yaml.git" },
 
-  "bin"             : { "jsyaml": "bin/js-yaml.js" },
+  "bin"             : {
+                        "jsyaml"    : "bin/js-yaml.js",
+                        "json2yaml" : "bin/json2yaml.js"
+                      },
   "main"            : "./index.js",
 
-  "engines"         : { "node": "> 0.4.11 < 0.7.0" }
+  "engines"         : { "node": "> 0.4.11" }
 }
