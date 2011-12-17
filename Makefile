@@ -1,4 +1,4 @@
-PATH        := ./node_modules/.bin:${PATH}
+PATH        := $(shell pwd)/node_modules/.bin:${PATH}
 
 PROJECT     :=  $(notdir ${PWD})
 TMP_PATH    := /tmp/${PROJECT}-$(shell date +%s)
@@ -10,34 +10,28 @@ CURR_HEAD 	:= $(firstword $(shell git show-ref --hash HEAD | cut --bytes=-6) mas
 GITHUB_NAME := nodeca/js-yaml
 SRC_URL_FMT := https://github.com/${GITHUB_NAME}/blob/${CURR_HEAD}/{file}\#L{line}
 
+JS_FILES    := $(shell find ./lib -type f -name '*.js' -print)
+
 lint:
 	@if test ! `which jslint` ; then \
-		echo "You need 'jslint' installed in order to generate docs." >&2 ; \
+		echo "You need 'jslint' installed in order to run lint." >&2 ; \
 		echo "  $ make dev-deps" >&2 ; \
 		exit 128 ; \
 		fi
 	# (node)    -> Node.JS compatibility mode
 	# (indent)  -> indentation level (2 spaces)
 	# (nomen)   -> tolerate underscores in identifiers (e.g. `var _val = 1`)
-	jslint --node --nomen --indent=2 ./lib/*.js ./lib/**/*.js
+	# (bitwise) -> tolerate bitwise operators (used in base64)
+	# (white) 	-> tolerate messy whitespace
+	jslint --node --nomen --bitwise --white --indent=2 ${JS_FILES}
 
-test: lint test-issues test-functional
-
-test-functional:
-	echo 
-	echo "## FUNCTIONAL ##################################################################"
-	echo "################################################################################"
-	echo 
-	node ./test/functional/run.js
-	echo 
-
-test-issues:
-	echo 
-	echo "## ISSUES ######################################################################"
-	echo "################################################################################"
-	echo 
-	node ./test/issues/run.js
-	echo 
+test: lint
+	@if test ! `which vows` ; then \
+		echo "You need 'vows' installed in order to run tests." >&2 ; \
+		echo "  $ make dev-deps" >&2 ; \
+		exit 128 ; \
+		fi
+	NODE_ENV=test vows --spec
 
 dev-deps:
 	@if test ! `which npm` ; then \
@@ -51,10 +45,10 @@ build: browserify uglify
 
 browserify:
 	if test ! `which browserify` ; then npm install browserify ; fi
-	cp -r support/browserify/ ${TMP_DIR}
-	browserify index.js -o ${TMP_DIR}/50_js-yaml.js
-	cat ${TMP_DIR}/* > js-yaml.js
-	rm -rf ${TMP_DIR}
+	cp -r support/browserify/ ${TMP_PATH}
+	browserify index.js -o ${TMP_PATH}/50_js-yaml.js
+	cat ${TMP_PATH}/* > js-yaml.js
+	rm -rf ${TMP_PATH}
 	cp js-yaml.js demo/js/
 
 uglify:
@@ -67,17 +61,17 @@ gh-pages:
 		echo 'Remote repo URL not found' >&2 ; \
 		exit 128 ; \
 		fi
-	mkdir ${TMP_DIR}
-	cp -r demo/* ${TMP_DIR}
-	touch ${TMP_DIR}/.nojekyll
-	cd ${TMP_DIR} && \
+	mkdir ${TMP_PATH}
+	cp -r demo/* ${TMP_PATH}
+	touch ${TMP_PATH}/.nojekyll
+	cd ${TMP_PATH} && \
 		git init && \
 		git add . && \
-		git commit -q -m 'Recreated docs'
-	cd ${TMP_DIR} && \
+		git commit -q -m 'Update browserified demo'
+	cd ${TMP_PATH} && \
 		git remote add remote ${REMOTE_REPO} && \
 		git push --force remote +master:gh-pages 
-	rm -rf ${TMP_DIR}
+	rm -rf ${TMP_PATH}
 
 todo:
 	grep 'TODO' -n -r ./lib 2>/dev/null || test true

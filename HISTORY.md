@@ -4,12 +4,16 @@
 * require now returns first found document in the stream instead of array
   of documents. See #10.
 
-0.3.2 / ????-??-??
+0.3.2 / 2011-12-16
 ------------------
 
+* Fixes ug with block style scalars. Closes #26.
+* All sources are passing JSLint now.
+* Fixes bug in Safari. Closes #28.
+* Fixes bug in Opers. Closes #29.
 * Improves browser support. Closes #20.
 * Added jsyaml executable.
-* Added !!js/function support. Finally resolves #12.
+* Added !!js/function support. Closes #12.
 
 0.3.1 / 2011-11-18
 ------------------
