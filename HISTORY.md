@@ -4,6 +4,12 @@
 * require now returns first found document in the stream instead of array
   of documents. See #10.
 
+0.3.3 / 2011-12-20
+------------------
+
+* jsyaml executable moved to separate module.
+* adds `compact` stringification of Errors.
+
 0.3.2 / 2011-12-16
 ------------------
 
