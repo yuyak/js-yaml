@@ -4,6 +4,11 @@
 * require now returns first found document in the stream instead of array
   of documents. See #10.
 
+0.3.4 / ????-??-??
+------------------
+
+* improves compact output of Error. Closes #33.
+
 0.3.3 / 2011-12-20
 ------------------
 
