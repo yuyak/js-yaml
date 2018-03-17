@@ -1,5 +1,3 @@
-PATH        := ./node_modules/.bin:${PATH}
-
 NPM_PACKAGE := $(shell node -e 'process.stdout.write(require("./package.json").name)')
 NPM_VERSION := $(shell node -e 'process.stdout.write(require("./package.json").version)')
 
@@ -8,60 +6,45 @@ TMP_PATH    := /tmp/${NPM_PACKAGE}-$(shell date +%s)
 REMOTE_NAME ?= origin
 REMOTE_REPO ?= $(shell git config --get remote.${REMOTE_NAME}.url)
 
-CURR_HEAD   := $(firstword $(shell git show-ref --hash HEAD | cut --bytes=-6) master)
-GITHUB_PROJ := nodeca/${NPM_PACKAGE}
+CURR_HEAD   := $(firstword $(shell git show-ref --hash HEAD | cut -b -6) master)
+GITHUB_PROJ := https://github.com/nodeca/${NPM_PACKAGE}
 
 
 help:
 	echo "make help       - Print this help"
 	echo "make lint       - Lint sources with JSHint"
 	echo "make test       - Lint sources and run all tests"
-	echo "make doc        - Build API docs"
-	echo "make dev-deps   - Install developer dependencies"
+	echo "make browserify - Build browserified version"
 	echo "make gh-pages   - Build and push API docs into gh-pages branch"
 	echo "make publish    - Set new version tag and publish npm package"
 	echo "make todo       - Find and list all TODOs"
 
 
 lint:
-	if test ! `which jshint` ; then \
-		echo "You need 'jshint' installed in order to run lint." >&2 ; \
-		echo "  $ make dev-deps" >&2 ; \
-		exit 128 ; \
-		fi
-	jshint . --show-non-errors
+	./node_modules/.bin/eslint .
 
 
 test: lint
-	@if test ! `which vows` ; then \
-		echo "You need 'vows' installed in order to run tests." >&2 ; \
-		echo "  $ make dev-deps" >&2 ; \
-		exit 128 ; \
-		fi
-	NODE_ENV=test vows --spec
+	@node -e "require('./bower.json')"
+	@node -e "require('./package.json')"
+	./node_modules/.bin/mocha -R spec
 
 
-doc:
-	@if test ! `which ndoc` ; then \
-		echo "You need 'ndoc' installed in order to generate docs." >&2 ; \
-		echo "  $ npm install -g ndoc" >&2 ; \
-		exit 128 ; \
-		fi
-	rm -rf ./doc
-	ndoc --link-format "{package.homepage}/blob/${CURR_HEAD}/{file}#L{line}"
+demo: lint
+	rm -rf ./demo
+	mkdir ./demo
+	cp ./node_modules/codemirror/lib/codemirror.css ./demo/
+	cp ./support/demo_template/index.html ./demo/
+	cp ./support/demo_template/demo.css ./demo/
+	./node_modules/.bin/browserify ./support/demo_template/demo.js -r esprima > ./demo/demo.js
 
 
-dev-deps:
-	@if test ! `which npm` ; then \
-		echo "You need 'npm' installed." >&2 ; \
-		echo "  See: http://npmjs.org/" >&2 ; \
-		exit 128 ; \
-		fi
-	npm install -g jshint
-	npm install
+coverage:
+	rm -rf coverage
+	./node_modules/.bin/istanbul cover node_modules/.bin/_mocha
 
 
-gh-pages:
+gh-pages: demo
 	@if test -z ${REMOTE_REPO} ; then \
 		echo 'Remote repo URL not found' >&2 ; \
 		exit 128 ; \
@@ -75,7 +58,7 @@ gh-pages:
 		git commit -q -m 'Updated browserified demo'
 	cd ${TMP_PATH} && \
 		git remote add remote ${REMOTE_REPO} && \
-		git push --force remote +master:gh-pages 
+		git push --force remote +master:gh-pages
 	rm -rf ${TMP_PATH}
 
 
@@ -93,23 +76,25 @@ publish:
 		exit 128 ; \
 		fi
 	git tag ${NPM_VERSION} && git push origin ${NPM_VERSION}
-	npm publish https://github.com/${GITHUB_PROJ}/tarball/${NPM_VERSION}
+	npm publish ${GITHUB_PROJ}/tarball/${NPM_VERSION}
 
 
 browserify:
-	if test ! `which browserify` ; then npm install browserify ; fi
-	if test ! `which uglifyjs` ; then npm install uglify-js ; fi
-	cp -r support/browserify/ ${TMP_PATH}
-	browserify -r ./index -o ${TMP_PATH}/50_js-yaml.js
-	cat ${TMP_PATH}/* > js-yaml.js
-	rm -rf ${TMP_PATH}
-	cp js-yaml.js demo/js/
-	uglifyjs js-yaml.js > js-yaml.min.js
+	rm -rf ./dist
+	mkdir dist
+	# Browserify
+	( echo -n "/* ${NPM_PACKAGE} ${NPM_VERSION} ${GITHUB_PROJ} */" ; \
+		./node_modules/.bin/browserify -r ./ -s jsyaml \
+		) > dist/js-yaml.js
+	# Minify
+	./node_modules/.bin/uglifyjs dist/js-yaml.js -c -m \
+		--preamble "/* ${NPM_PACKAGE} ${NPM_VERSION} ${GITHUB_PROJ} */" \
+		> dist/js-yaml.min.js
 
 
 todo:
 	grep 'TODO' -n -r ./lib 2>/dev/null || test true
 
 
-.PHONY: publish lint test doc dev-deps gh-pages todo
-.SILENT: help lint test doc todo
+.PHONY: publish lint test dev-deps gh-pages todo coverage demo
+.SILENT: help lint test todo coverage
